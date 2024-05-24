@@ -50,7 +50,7 @@ class Template:
         swaps = ", ".join(
             f"{key}={value}" for key, value in self.swaps.items()
         )
-        return f"Template(root={self.root}, swaps={swaps})"
+        return f"Template(template_path={self.root_path}, root={self.root}, swaps={swaps})"
 
     def parse_swaps(self, **swaps):
         """Parse the swaps."""
