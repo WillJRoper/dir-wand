@@ -25,6 +25,29 @@ class StoreDictKeyPair(argparse.Action):
         getattr(namespace, "replacements")[key] = values
 
 
+class StoreListKeyPair(argparse.Action):
+    """A class for storing key-value pairs from the command line."""
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        """
+        Store the key-value pair in the namespace.
+
+        Args:
+            parser (argparse.ArgumentParser):
+                The parser instance.
+            namespace (argparse.Namespace):
+                The namespace to store the key-value pair in.
+            values (str):
+                The key-value pair to store.
+            option_string (str):
+                The option string.
+        """
+        key = option_string.lstrip("-")
+        if not hasattr(namespace, "list_args"):
+            setattr(namespace, "list_args", {})
+        namespace.list_args[key] = values
+
+
 class Parser(argparse.ArgumentParser):
     """
     A class for parsing command line arguments.
@@ -72,6 +95,13 @@ class Parser(argparse.ArgumentParser):
             nargs=1,
             metavar="VALUE",
         )
+        self.add_argument(
+            "-",
+            dest="replacements",
+            action=StoreListKeyPair,
+            nargs="+",
+            metavar="VALUE",
+        )
 
     def __str__(self):
         """Summarise the command line arguments."""
@@ -93,17 +123,31 @@ class Parser(argparse.ArgumentParser):
         # Parse arguments
         args, unknown_args = self.parse_known_args()
 
+        args.replacements = {}
+
         # Process unknown_args manually
         while unknown_args:
             if unknown_args[0].startswith("--"):
                 key = unknown_args.pop(0).lstrip("--")
-                if unknown_args and not unknown_args[0].startswith("--"):
+                if (
+                    unknown_args
+                    and not unknown_args[0].startswith("-")
+                    and not unknown_args[0].startswith("--")
+                ):
                     value = unknown_args.pop(0)
-                    if not hasattr(args, "replacements"):
-                        args.replacements = {}
                     args.replacements[key] = value
                 else:
                     args.replacements[key] = None
+            elif unknown_args[0].startswith("-"):
+                key = unknown_args.pop(0).lstrip("-")
+                values = []
+                while (
+                    unknown_args
+                    and not unknown_args[0].startswith("-")
+                    and not unknown_args[0].startswith("--")
+                ):
+                    values.append(unknown_args.pop(0))
+                args.replacements[key] = values
             else:
                 unknown_args.pop(0)
 
