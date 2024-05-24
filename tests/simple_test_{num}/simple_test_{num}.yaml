@@ -1,0 +1,4 @@
+PlaceHolder:
+  variable: {x}
+  another_variable: {y}
+  something_else: {flag}
