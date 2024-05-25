@@ -30,7 +30,25 @@ from dir_wand.file import File
 
 
 class Directory:
-    """A class for defining the directory."""
+    """
+    A class for defining the directory.
+
+    A directory is a tree structure containing files and other directories.
+    Once instantiated, the directory will unpack its contents and build the
+    tree structure.
+
+    A single call to `make_copy_with_swaps` will make a copy of the directory
+    and any files it contains including any children directories with the
+    placeholders swapped out.
+
+    Attributes:
+        path (str):
+            The path to the directory.
+        children (list):
+            A list of child directories.
+        files (list):
+            A list of files in the directory.
+    """
 
     def __init__(self, path):
         """
@@ -45,11 +63,25 @@ class Directory:
         self.files = []
 
     def __str__(self):
-        """Return the string representation of the directory."""
+        """
+        Return the string representation of the directory.
+
+        Returns:
+            str:
+                The string representation of the directory.
+        """
         return self._str_helper()
 
     def _str_helper(self, prefix="", is_last=True):
-        """Build the string representation with lines and indentation."""
+        """
+        Build the string representation with lines and indentation.
+
+        Args:
+            prefix (str):
+                The prefix to add to the string.
+            is_last (bool):
+                Whether the directory is the last in the list.
+        """
         connector = "└── " if is_last else "├── "
         result = f"{prefix}{connector}{os.path.basename(self.path)}/\n"
         prefix += "    " if is_last else "│   "

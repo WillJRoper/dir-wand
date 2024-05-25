@@ -93,6 +93,10 @@ class Template:
         Args:
             **swaps (dict):
                 The swaps to make in the template.
+
+        Raises:
+            ValueError:
+                If the number of swaps isn't equal between all placeholders.
         """
         for key, value in swaps.items():
             # Do we have a list?
@@ -117,7 +121,17 @@ class Template:
         return swaps
 
     def make_copies(self, new_root):
-        """Make copies of the template."""
+        """
+        Make copies of the template.
+
+        This method is the main interface to copying the template. It will call
+        the copy method of the template root directory, which will recursively
+        copy all the directories and files in the template.
+
+        Args:
+            new_root (str):
+                The path to the new root directory.
+        """
         # Unpack all the swaps into each set of directories we'll need to make
         swaps = [
             {swap: self.swaps[swap][i] for swap in self.swaps}

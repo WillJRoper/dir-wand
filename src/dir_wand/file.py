@@ -25,11 +25,39 @@ import re
 
 
 class File:
-    """A class for defining the file."""
+    """
+    A class for defining the file.
+
+    A file contains all the information to make copies of a template file.
+
+    A file can be a softlink, executable, hidden, empty, or a text based file
+    containing placeholders.
+
+    Attributes:
+        path (str):
+            The path to the file.
+        name (str):
+            The name of the file.
+        is_softlink (bool):
+            Whether the file is a softlink.
+        is_executable (bool):
+            Whether the file is executable.
+        is_hidden (bool):
+            Whether the file is hidden.
+        is_empty (bool):
+            Whether the file is empty.
+        is_text (bool):
+            Whether the file is text.
+        has_placeholders (bool):
+            Whether the file has placeholders.
+    """
 
     def __init__(self, path):
         """
         Create the file instance.
+
+        As well creating the File instance, we will also extract any
+        placeholders and their line index for quicker swapping later.
 
         Args:
             path (str):
@@ -45,7 +73,13 @@ class File:
         self.get_placeholders()
 
     def __str__(self):
-        """Return the string representation of the file."""
+        """
+        Return the string representation of the file.
+
+        Returns:
+            str:
+                The string representation of the file.
+        """
         return self.path
 
     @property
@@ -127,7 +161,6 @@ class File:
         Args:
             path (str):
                 The path to save the new file.
-
             **swaps:
                 The placeholders to swap out.
         """
