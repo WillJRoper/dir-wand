@@ -69,6 +69,7 @@ class CommandRunner:
 
         # Function to run the command
         def run():
+            print(f"Running command: {command}")
             try:
                 status = os.system(command)
                 if status != 0:
