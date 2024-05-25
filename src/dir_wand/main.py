@@ -27,13 +27,10 @@ def main():
     print(ASCII_ART)
     print()
 
-    print("Waving the Directory WAND...")
-
     # Create the template
     template = Template(args.template, run=args.run, **args.replacements)
 
     # Give some feedback
-    print()
     print(template)
     print()
     print("Template structure:")

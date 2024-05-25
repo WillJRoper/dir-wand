@@ -80,13 +80,7 @@ class Template:
             str:
                 The string representation of the template.
         """
-        swaps = ", ".join(
-            f"{key}={value}" for key, value in self.swaps.items()
-        )
-        return (
-            f"Template(template_path={self.root_path},"
-            f" root={self.root}, swaps={swaps})"
-        )
+        return f"Waving the directory WAND on {self.root_path}..."
 
     def parse_swaps(self, **swaps):
         """
@@ -122,6 +116,20 @@ class Template:
 
         return swaps
 
+    def swap_str(self, swap):
+        """
+        Return a string representation of a set of swaps.
+
+        Args:
+            swap (dict):
+                The swap dictionary.
+
+        Returns:
+            str:
+                The string representation of the swap.
+        """
+        return ",\n".join(f"    {key}: {value}" for key, value in swap.items())
+
     def make_copies(self, new_root):
         """
         Make copies of the template.
@@ -146,10 +154,14 @@ class Template:
             # the files and directories handling the swaps
             self.directory.make_copy_with_swaps(new_root, **swap)
 
+            print("Copy made for {\n" + self.swap_str(swap) + "\n}")
+
             # If we have a command to run, run it (this will be done on a
             # concurrent thread so we don't block the main thread)
             if self.run_cmd is not None:
                 self.run_cmd.run_command(**swap)
+
+            print()
 
         # Wait for the command threads before exiting if we need to
         if self.run_cmd is not None:
