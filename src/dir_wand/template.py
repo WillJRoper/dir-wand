@@ -65,7 +65,7 @@ class Template:
         self.directory.unpack_contents()
 
         # Parse the swaps, we'll store these in a dictionary
-        self.swaps = self.parse_swaps(**swaps)
+        self.swaps = swaps
         self.nswap_vars = len(self.swaps)
         self.nswaps = len(list(self.swaps.values())[0])
 
@@ -82,41 +82,8 @@ class Template:
         """
         return f"Waving the directory WAND on {self.root_path}..."
 
-    def parse_swaps(self, **swaps):
-        """
-        Parse the swaps.
-
-        Args:
-            **swaps (dict):
-                The swaps to make in the template.
-
-        Raises:
-            ValueError:
-                If the number of swaps isn't equal between all placeholders.
-        """
-        for key, value in swaps.items():
-            # Do we have a list?
-            if isinstance(value, (list, tuple)):
-                swaps[key] = value
-
-            # Do we have the defintion of a range, i.e. 1-10?
-            elif "-" in value:
-                # Split the range
-                start, end = value.split("-")
-
-                # Convert the range to a dictionary
-                swaps[key] = list(range(int(start), int(end) + 1))
-            else:
-                raise ValueError(f"Invalid swap value: {value}")
-
-        # Ensure we have the same number of elements for all swaps
-        lengths = {len(value) for value in swaps.values()}
-        if len(lengths) > 1:
-            raise ValueError("All swaps must have the same number of elements")
-
-        return swaps
-
-    def swap_str(self, swap):
+    @staticmethod
+    def swap_str(swap):
         """
         Return a string representation of a set of swaps.
 

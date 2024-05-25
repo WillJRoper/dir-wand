@@ -9,8 +9,45 @@ Example:
 """
 
 from dir_wand.art import ASCII_ART
+from dir_wand.command_runner import CommandRunner
 from dir_wand.parser import Parser
 from dir_wand.template import Template
+
+
+def copies_main(args):
+    """
+    Make copies of a template directory.
+
+    Args:
+        args (Namespace):
+            The parsed command line arguments.
+    """
+    # Create the template
+    template = Template(args.template, run=args.run, **args.replacements)
+
+    # Give some feedback
+    print(template)
+    print()
+    print("Template structure:")
+    print(template.directory)
+
+    # Make the copy
+    template.make_copies(args.root)
+
+
+def run_main(args):
+    """
+    Run a command in a directory.
+
+    Args:
+        args (Namespace):
+            The parsed command line arguments.
+    """
+    # Create the command runner
+    command_runner = CommandRunner(args.run)
+
+    # Run the command for all the swap combinations
+    command_runner.run_command_for_all_swaps(**args.replacements)
 
 
 def main():
@@ -27,17 +64,12 @@ def main():
     print(ASCII_ART)
     print()
 
-    # Create the template
-    template = Template(args.template, run=args.run, **args.replacements)
-
-    # Give some feedback
-    print(template)
-    print()
-    print("Template structure:")
-    print(template.directory)
-
-    # Make the copy
-    template.make_copies(args.root)
+    # Are we copying a template?
+    if args.template is not None:
+        copies_main(args)
+    else:
+        # Otherwise, we're simply running a command
+        run_main(args)
 
     # Report we're done
     print("Done!")

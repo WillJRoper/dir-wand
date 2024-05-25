@@ -37,7 +37,6 @@ class CommandRunner:
             command (str):
                 The command to run.
         """
-
         # Store the command
         self.command = command
 
@@ -54,7 +53,7 @@ class CommandRunner:
         directory.
 
         To stop blocking the main thread running a copy the running of the
-        command line will be done on a concurrent thread.
+        command line will be doneon a concurrent thread.
 
         Args:
             swaps (dict):
@@ -94,6 +93,30 @@ class CommandRunner:
 
         # Add the thread to the list
         self.threads.append(thread)
+
+    def run_command_for_all_swaps(self, **swaps):
+        """
+        Run a command for all swaps.
+
+        Args:
+            swaps (dict):
+                A dictionary of swaps to use when running the command.
+        """
+        # Count the swaps
+        nswaps = len(list(swaps.values())[0])
+
+        # Unpack all the swaps into each set we'll need to run
+        swaps = [
+            {swap: swaps[swap][i] for swap in swaps} for i in range(nswaps)
+        ]
+
+        # Loop over the swaps we'll have to make
+        for swap in swaps:
+            self.run_command(**swap)
+            print()
+
+        # Wait for the command threads before exiting
+        self.wait_for_all()
 
     def wait_for_all(self):
         """Wait for all threads to complete."""
