@@ -35,5 +35,4 @@ jobs:
     - uses: chartboost/ruff-action@v1  # Lint with Ruff
     - name: Test
       run: |
-        mkdir tests/results
         dir-wand tests/simple_test_{num}  --root tests/results/ --num 0-4 -x 1 2 3 4 5 --y 9-13 -flag 0 0 0 1 1
