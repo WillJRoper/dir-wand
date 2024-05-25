@@ -8,6 +8,7 @@ Example:
     --swap1 value1 --swap2 value2 -swap3 value3 value4 value5
 """
 
+from dir_wand.art import ASCII_ART
 from dir_wand.parser import Parser
 from dir_wand.template import Template
 
@@ -21,11 +22,20 @@ def main():
     # Get the arguments
     args = parser.parse_args()
 
+    # Greet
+    print()
+    print(ASCII_ART)
+    print()
+
+    print("Waving the Directory WAND...")
+
     # Create the template
     template = Template(args.template, run=args.run, **args.replacements)
 
     # Give some feedback
+    print()
     print(template)
+    print()
     print("Template structure:")
     print(template.directory)
 
