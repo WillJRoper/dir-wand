@@ -1,4 +1,10 @@
-"""A module containing the command-line interface for Directory WAND."""
+"""A module containing the command-line interface for Directory WAND.
+
+This module contains the Parser class for parsing command line arguments. The
+Parser class is a wrapper around the argparse.ArgumentParser class that adds
+some standardised arguments and enables arbitrarily many arbitrarily named
+arguments.
+"""
 
 import argparse
 
