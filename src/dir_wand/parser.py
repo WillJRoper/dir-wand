@@ -95,6 +95,10 @@ class Parser(argparse.ArgumentParser):
             action=StoreDictKeyPair,
             nargs=1,
             metavar="VALUE",
+            help="A key-value pair for a placeholder replacement. Should "
+            "be in the form --key value, where key is the name ({name}) to "
+            "replace in directory paths and files, and value is an "
+            "inclusive range (1-5).",
         )
         self.add_argument(
             "-",
@@ -102,6 +106,10 @@ class Parser(argparse.ArgumentParser):
             action=StoreListKeyPair,
             nargs="+",
             metavar="VALUE",
+            help="A key-value pair for a placeholder replacement. Should "
+            "be in the form -key value1 value2 value3, where key is the name "
+            "({name}) to replace in directory paths and files, and value is "
+            "a list.",
         )
 
     def __str__(self):
