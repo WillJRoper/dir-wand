@@ -1,4 +1,12 @@
-"""The main runner for Directory WAND"""
+"""The main runner for Directory WAND.
+
+This module contains the main runner for Directory WAND. This is the entry
+point for the template copying command line interface.
+
+Example:
+    $ python -m dir_wand path/to/template --root path/to/root
+    --swap1 value1 --swap2 value2 -swap3 value3 value4 value5
+"""
 
 from dir_wand.parser import Parser
 from dir_wand.template import Template
