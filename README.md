@@ -4,6 +4,7 @@
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![PyPI version](https://badge.fury.io/py/dir-wand.svg)](https://badge.fury.io/py/dir-wand)
 
 WAND is a Python CLI tool for creating a large number of directories from a single template and executing commands globally throughout every directory.
 
@@ -12,7 +13,7 @@ WAND is a Python CLI tool for creating a large number of directories from a sing
 To install WAND simply run
 
 ``` sh
-pip install .
+pip install dir-wand
 ```
 
 in the root directory of WAND. This will install the `dir-wand` CLI. 
@@ -64,8 +65,9 @@ dir-wand --template simple_example_{num}/ --root /where/to/put/copies/ --num 0-2
 
 Here we've passed the filepath to the template directory (which can be an absolute or relative path), an optional root for the copies (if not given the copies will be made in the current working directory) and a set of key-value pairs for each placeholder (of the form --key value). These values can be:
 
-- The definition of an inclusive range using 2 dashes (e.g. `--num 0-2` will replace `num` values of 0, 1, and 2).
+- The definition of an inclusive range using 2 dashes (e.g. `--num 0-2` will replace `num` with values of 0, 1, and 2).
 - A list of values using 1 dash (e.g. `-flag 0 1 0` will replace `flag` with 0, 1, and 0).
+- The path to a file containing a list of strings (Coming soon...).
 
 NOTE: The number of values for each placeholder must be the same. If not, WAND will raise an error.
 

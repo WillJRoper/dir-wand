@@ -4,17 +4,40 @@ name = "dir-wand"
 # Dynamic version numbers from git
 dynamic = ["version"]
 
-description = "A CLI tool that automates the creation of directory structures from templates and populates placeholder variables."
-
+description = "A CLI tool for making many directories from a template automagically."
 authors = [
     { name = "Will Roper", email = "w.roper@sussex.ac.uk" }
 ]
+readme = "README.md"
+license = { file = "LICENSE" }
 
 # Minimum Python version
 requires-python = ">=3.8"
 
-license = { text = "GNU" }
+# No dependencies to run
 dependencies = []
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License (GPL)",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Utilities"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/WillJRoper/dir-wand"
+"Source" = "https://github.com/WillJRoper/dir-wand"
+"Tracker" = "https://github.com/WillJRoper/dir-wand/issues"
 
 # Optional dependencies for specific use cases
 [project.optional-dependencies]
