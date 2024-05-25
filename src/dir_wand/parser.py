@@ -94,6 +94,15 @@ class Parser(argparse.ArgumentParser):
             help="The root directory for the outputs.",
         )
 
+        # Add an optional argument for a command to run once a copy is complete
+        self.add_argument(
+            "--run",
+            type=str,
+            help="A command to run in each copy once the copy is complete."
+            "The command will be run in the current working directory.",
+            default=None,
+        )
+
         # Add arbitrary arguments
         self.add_argument(
             "--",
@@ -165,5 +174,7 @@ class Parser(argparse.ArgumentParser):
                 args.replacements[key] = values
             else:
                 unknown_args.pop(0)
+
+        print(args.run)
 
         return args
