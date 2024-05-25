@@ -15,6 +15,7 @@ Example:
 
 import os
 
+from dir_wand.command_runner import CommandRunner
 from dir_wand.directory import Directory
 
 
@@ -41,13 +42,15 @@ class Template:
             The number of swaps to make.
     """
 
-    def __init__(self, root, **swaps):
+    def __init__(self, root, run=None, **swaps):
         """
         Create the template instance.
 
         Args:
             root (str):
                 The path to the root of the template.
+            run (str):
+                The command to run after the template is copied.
             **swaps (dict):
                 The swaps to make in the template.
         """
@@ -61,14 +64,13 @@ class Template:
         self.directory = Directory(self.root_path)
         self.directory.unpack_contents()
 
-        # Print the directory structure
-        print("Template structure:")
-        print(self.directory)
-
         # Parse the swaps, we'll store these in a dictionary
-        self.swaps = self.parse_swaps(**swaps)
+        self.swaps = swaps
         self.nswap_vars = len(self.swaps)
         self.nswaps = len(list(self.swaps.values())[0])
+
+        # Store the run command (if not given this will be None)
+        self.run_cmd = CommandRunner(run) if run is not None else None
 
     def __str__(self):
         """
@@ -78,47 +80,22 @@ class Template:
             str:
                 The string representation of the template.
         """
-        swaps = ", ".join(
-            f"{key}={value}" for key, value in self.swaps.items()
-        )
-        return (
-            f"Template(template_path={self.root_path},"
-            f" root={self.root}, swaps={swaps})"
-        )
+        return f"Waving the directory WAND on {self.root_path}..."
 
-    def parse_swaps(self, **swaps):
+    @staticmethod
+    def swap_str(swap):
         """
-        Parse the swaps.
+        Return a string representation of a set of swaps.
 
         Args:
-            **swaps (dict):
-                The swaps to make in the template.
+            swap (dict):
+                The swap dictionary.
 
-        Raises:
-            ValueError:
-                If the number of swaps isn't equal between all placeholders.
+        Returns:
+            str:
+                The string representation of the swap.
         """
-        for key, value in swaps.items():
-            # Do we have a list?
-            if isinstance(value, (list, tuple)):
-                swaps[key] = value
-
-            # Do we have the defintion of a range, i.e. 1-10?
-            elif "-" in value:
-                # Split the range
-                start, end = value.split("-")
-
-                # Convert the range to a dictionary
-                swaps[key] = list(range(int(start), int(end) + 1))
-            else:
-                raise ValueError(f"Invalid swap value: {value}")
-
-        # Ensure we have the same number of elements for all swaps
-        lengths = {len(value) for value in swaps.values()}
-        if len(lengths) > 1:
-            raise ValueError("All swaps must have the same number of elements")
-
-        return swaps
+        return ",\n".join(f"    {key}: {value}" for key, value in swap.items())
 
     def make_copies(self, new_root):
         """
@@ -143,3 +120,16 @@ class Template:
             # Make a copy of the root directory, this will recursively copy all
             # the files and directories handling the swaps
             self.directory.make_copy_with_swaps(new_root, **swap)
+
+            print("Copy made for {\n" + self.swap_str(swap) + "\n}")
+
+            # If we have a command to run, run it (this will be done on a
+            # concurrent thread so we don't block the main thread)
+            if self.run_cmd is not None:
+                self.run_cmd.run_command(**swap)
+
+            print()
+
+        # Wait for the command threads before exiting if we need to
+        if self.run_cmd is not None:
+            self.run_cmd.wait_for_all()

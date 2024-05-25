@@ -9,6 +9,42 @@ arguments.
 import argparse
 
 
+def parse_swaps(**swaps):
+    """
+    Parse the swaps.
+
+    Args:
+        **swaps (dict):
+            The swaps to make in the template.
+
+    Raises:
+        ValueError:
+            If the number of swaps isn't equal between all placeholders.
+    """
+    for key, value in swaps.items():
+        print(key, value)
+        # Do we have a list?
+        if isinstance(value, (list, tuple)):
+            swaps[key] = value
+
+        # Do we have the defintion of a range, i.e. 1-10?
+        elif "-" in value:
+            # Split the range
+            start, end = value.split("-")
+
+            # Convert the range to a dictionary
+            swaps[key] = list(range(int(start), int(end) + 1))
+        else:
+            raise ValueError(f"Invalid swap value: {value}")
+
+    # Ensure we have the same number of elements for all swaps
+    lengths = {len(value) for value in swaps.values()}
+    if len(lengths) > 1:
+        raise ValueError("All swaps must have the same number of elements")
+
+    return swaps
+
+
 class StoreDictKeyPair(argparse.Action):
     """A class for storing key-value pairs from the command line."""
 
@@ -81,17 +117,27 @@ class Parser(argparse.ArgumentParser):
 
         # Add the template argument
         self.add_argument(
-            "template",
+            "--template",
             type=str,
             help="The template to use for the model.",
+            default=None,
         )
 
         # Add an optional path to the root for the outputs
         self.add_argument(
             "--root",
             type=str,
-            default=".",
             help="The root directory for the outputs.",
+            default=".",
+        )
+
+        # Add an optional argument for a command to run once a copy is complete
+        self.add_argument(
+            "--run",
+            type=str,
+            help="A command to run in each copy once the copy is complete. "
+            "The command will be run in the current working directory.",
+            default=None,
         )
 
         # Add arbitrary arguments
@@ -165,5 +211,8 @@ class Parser(argparse.ArgumentParser):
                 args.replacements[key] = values
             else:
                 unknown_args.pop(0)
+
+        # Parse the swaps so we have what we need
+        args.replacements = parse_swaps(**args.replacements)
 
         return args

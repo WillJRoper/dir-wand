@@ -72,7 +72,7 @@ class Directory:
         """
         return self._str_helper()
 
-    def _str_helper(self, prefix="", is_last=True):
+    def _str_helper(self, prefix="  ", is_last=True):
         """
         Build the string representation with lines and indentation.
 

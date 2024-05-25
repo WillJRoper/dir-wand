@@ -60,10 +60,10 @@ PlaceHolders:
 To make copies of this template directory we can use the `dir-wand` CLI tool. `dir-wand` needs a set of values for each placeholder along with the path to the template directory, e.g.:
 
 ``` sh
-dir-wand simple_example_{num}/ --root /where/to/put/copies/ --num 0-2 --x 1-3 --y 2-4 -flag 0 1 0
+dir-wand --template simple_example_{num}/ --root /where/to/put/copies/ --num 0-2 --x 1-3 --y 2-4 -flag 0 1 0
 ```
 
-Here we've passed the filepath to the template directory (which can be an absolute or relative path), an optional root for the copies (if not given the copies will be made in the directory the command was run in) and a set of key-value pairs for each placeholder (of the form --key value). These values can be:
+Here we've passed the filepath to the template directory (which can be an absolute or relative path), an optional root for the copies (if not given the copies will be made in the current working directory) and a set of key-value pairs for each placeholder (of the form --key value). These values can be:
 
 - The definition of an inclusive range using 2 dashes (e.g. `--num 0-2` will replace `num` with values of 0, 1, and 2).
 - A list of values using 1 dash (e.g. `-flag 0 1 0` will replace `flag` with 0, 1, and 0).
@@ -113,6 +113,44 @@ PlaceHolders:
 
 with the other files made accordingly.
 
-## Running commands
+### Using a swap file
 
 Coming soon...
+
+### Running commands after a copy
+
+When making copies of a template directory, WAND can also run commands in each directory. This can be done by passing the `--run` argument followed by the command to run wrapped by `"`. For example:
+
+``` sh
+dir-wand --template simple_example_{num}/ --root /where/to/put/copies/ --num 0-2 --x 1-3 --y 2-4 -flag 0 1 0 --run "echo 'Hello from simple_example_{num}'"
+```
+
+will create the directories as before and run the command `echo 'Hello from simple_example_{num}'` in each directory. This will output:
+
+```
+Hello from simple_example_0
+Hello from simple_example_1
+Hello from simple_example_2
+```
+
+These commands can be any valid shell command or even a script. The commands will be run on concurrent threads to ensure the main thread making the copies is not blocked so the world is your oyster!
+
+## Using WAND to run commands in existing directories
+
+WAND can also be used to run commands in existing directories with identical structures and "placeholder compliant" naming. 
+
+This can be done by passing the `--run` argument including placeholders and any required swaps. For example, if we assume the example template directory above is already made, where we have the directories (including all their contents):
+
+```
+├── simple_example_0/
+├── simple_example_1/
+└── simple_example_2/
+```
+
+Then we can run a command in each directory using:
+
+``` sh
+dir-wand --run "cd simple_example_{num}; head -2 simple_example_{num}.yaml" --num 0-2
+```
+
+This will output the first 2 lines of each `simple_example_{num}.yaml` file in each directory. Note that any command passed to `--run` will be run in the current working directory. 
