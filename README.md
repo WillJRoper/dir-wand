@@ -6,6 +6,8 @@
 [![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![PyPI version](https://badge.fury.io/py/dir-wand.svg)](https://badge.fury.io/py/dir-wand)
 
+![wand-logo](https://github.com/WillJRoper/dir-wand/assets/40025495/8ad6d775-c7e8-45df-88bd-21511d6ce6f1)
+
 WAND is a Python CLI tool for creating a large number of directories from a single template and executing commands globally throughout every directory.
 
 ## Installation
