@@ -49,7 +49,8 @@ To include placeholders in a file we can again use the curly brace notation. For
 
 ``` yaml
 PlaceHolders:
-  run:              {num}
+  run_number:       {num}
+  run_directory:    simple_example_{num}
   variable:         {x}
   another_variable: {y}
   some_flag:        {flag}
@@ -101,7 +102,8 @@ and `simple_example_0.yaml` will contain:
 
 ``` yaml
 PlaceHolders:
-  run:              0
+  run_number:       0
+  run_directory:    simple_example_0
   variable:         1
   another_variable: 2
   some_flag:        0
