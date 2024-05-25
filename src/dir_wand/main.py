@@ -1,5 +1,5 @@
-"""The main runner for Directory WAND
-"""
+"""The main runner for Directory WAND"""
+
 from dir_wand.parser import Parser
 from dir_wand.template import Template
 

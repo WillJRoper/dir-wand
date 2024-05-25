@@ -6,27 +6,50 @@ will be constructed and can later be copied with the placeholders swapped out.
 
 Example:
     # Create a template instance
-    template = Template("path/to/template", swap1=[1, 2, 3], swap2=[4, 5])
+    template = Template("path/to/template", swap1=[1, 2, 3], swap2=[4, 5, 7])
 
     # Make copies of the template
     template.make_copies("path/to/new/template")
 
 """
+
 import os
 
 from dir_wand.directory import Directory
 
 
 class Template:
-    """A class for defining the template."""
+    """
+    A class for defining the template.
+
+    A template is the controller class that will manage the directory tree
+    making copies of the template with the placeholders swapped out, and
+    running any commands that need to be executed.
+
+    Attributes:
+        root_path (str):
+            The path to the root of the template.
+        root (str):
+            The name of the root directory.
+        directory (Directory):
+            The root directory of the template.
+        swaps (dict):
+            A dictionary of the swaps to make.
+        nswap_vars (int):
+            The number of swap variables.
+        nswaps (int):
+            The number of swaps to make.
+    """
 
     def __init__(self, root, **swaps):
         """
         Create the template instance.
 
         Args:
-            template (str):
-                The template to use for the model.
+            root (str):
+                The path to the root of the template.
+            **swaps (dict):
+                The swaps to make in the template.
         """
         # Attach a pointer to the root of the template
         self.root_path = root
@@ -38,6 +61,8 @@ class Template:
         self.directory = Directory(self.root_path)
         self.directory.unpack_contents()
 
+        # Print the directory structure
+        print("Template structure:")
         print(self.directory)
 
         # Parse the swaps, we'll store these in a dictionary
@@ -46,14 +71,29 @@ class Template:
         self.nswaps = len(list(self.swaps.values())[0])
 
     def __str__(self):
-        """Return the string representation of the template."""
+        """
+        Return the string representation of the template.
+
+        Returns:
+            str:
+                The string representation of the template.
+        """
         swaps = ", ".join(
             f"{key}={value}" for key, value in self.swaps.items()
         )
-        return f"Template(template_path={self.root_path}, root={self.root}, swaps={swaps})"
+        return (
+            f"Template(template_path={self.root_path},"
+            f" root={self.root}, swaps={swaps})"
+        )
 
     def parse_swaps(self, **swaps):
-        """Parse the swaps."""
+        """
+        Parse the swaps.
+
+        Args:
+            **swaps (dict):
+                The swaps to make in the template.
+        """
         for key, value in swaps.items():
             # Do we have a list?
             if isinstance(value, (list, tuple)):

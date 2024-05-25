@@ -19,6 +19,7 @@ Example:
     file.make_copy_with_swaps("path/to/new/file", placeholder="value")
 
 """
+
 import os
 import re
 

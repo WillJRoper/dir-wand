@@ -1,4 +1,5 @@
 """A module containing the command-line interface for Directory WAND."""
+
 import argparse
 
 
