@@ -12,7 +12,7 @@ WAND is a Python CLI tool for creating a large number of directories from a sing
 To install WAND simply run
 
 ``` sh
-pip install .
+pip install dir-wand
 ```
 
 in the root directory of WAND. This will install the `dir-wand` CLI. 
