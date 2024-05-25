@@ -15,6 +15,7 @@ Example:
 
 import os
 
+from dir_wand.command_runner import CommandRunner
 from dir_wand.directory import Directory
 
 
@@ -41,13 +42,15 @@ class Template:
             The number of swaps to make.
     """
 
-    def __init__(self, root, **swaps):
+    def __init__(self, root, run=None, **swaps):
         """
         Create the template instance.
 
         Args:
             root (str):
                 The path to the root of the template.
+            run (str):
+                The command to run after the template is copied.
             **swaps (dict):
                 The swaps to make in the template.
         """
@@ -69,6 +72,9 @@ class Template:
         self.swaps = self.parse_swaps(**swaps)
         self.nswap_vars = len(self.swaps)
         self.nswaps = len(list(self.swaps.values())[0])
+
+        # Store the run command (if not given this will be None)
+        self.run_cmd = CommandRunner(run) if run is not None else None
 
     def __str__(self):
         """
@@ -143,3 +149,12 @@ class Template:
             # Make a copy of the root directory, this will recursively copy all
             # the files and directories handling the swaps
             self.directory.make_copy_with_swaps(new_root, **swap)
+
+            # If we have a command to run, run it (this will be done on a
+            # concurrent thread so we don't block the main thread)
+            if self.run_cmd is not None:
+                self.run_cmd.run_command(**swap)
+
+        # Wait for the command threads before exiting if we need to
+        if self.run_cmd is not None:
+            self.run_cmd.wait_for_all()
