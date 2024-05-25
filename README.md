@@ -64,8 +64,9 @@ dir-wand simple_example_{num}/ --root /where/to/put/copies/ --num 0-2 --x 1-3 --
 
 Here we've passed the filepath to the template directory (which can be an absolute or relative path), an optional root for the copies (if not given the copies will be made in the directory the command was run in) and a set of key-value pairs for each placeholder (of the form --key value). These values can be:
 
-- The definition of an inclusive range using 2 dashes (e.g. `--num 0-2` will replace `num` values of 0, 1, and 2).
+- The definition of an inclusive range using 2 dashes (e.g. `--num 0-2` will replace `num` with values of 0, 1, and 2).
 - A list of values using 1 dash (e.g. `-flag 0 1 0` will replace `flag` with 0, 1, and 0).
+- The path to a file containing a list of strings (Coming soon...).
 
 NOTE: The number of values for each placeholder must be the same. If not, WAND will raise an error.
 
