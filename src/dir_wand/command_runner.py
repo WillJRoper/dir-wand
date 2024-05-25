@@ -9,6 +9,7 @@ The command runner uses concurrent threads to run the commands in parallel.
 """
 
 import os
+import re
 import threading
 
 
@@ -44,6 +45,25 @@ class CommandRunner:
         # complete at a later stage
         self.threads = []
 
+        # Unpack placeholders
+        self._placeholders = set()
+        self.get_placeholders()
+
+    def get_placeholders(self):
+        """Extract what place holders the command contains."""
+        # Define the regex pattern to extract the placeholders
+        # (e.g. {placeholder})
+        pattern = re.compile(r"\{([a-zA-Z0-9_]+)\}")
+
+        # Find all the matches in the command
+        matches = pattern.findall(self.command)
+
+        # If we have matches...
+        if matches is not None:
+            # Add the placeholders to the set
+            for match in matches:
+                self._placeholders.add(match)
+
     def run_command(self, **swaps):
         """
         Run the command.
@@ -62,6 +82,11 @@ class CommandRunner:
         # Exit if we have nothing to run
         if not self.command:
             return
+
+        # Ensure we have all the placeholders before we start swapping
+        missing = self._placeholders - set(swaps.keys())
+        if len(missing) > 0:
+            raise ValueError(f"Missing placeholders: {missing}")
 
         # Replace any swaps in the command
         command = self.command.format(**swaps)
@@ -109,6 +134,8 @@ class CommandRunner:
         swaps = [
             {swap: swaps[swap][i] for swap in swaps} for i in range(nswaps)
         ]
+
+        # Ensure we have all the swaps we need for the command
 
         # Loop over the swaps we'll have to make
         for swap in swaps:
