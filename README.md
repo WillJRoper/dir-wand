@@ -1,19 +1,109 @@
-# Directory WAND: WAND Automates Nested Directories
+# WAND: WAND Automates Nested Directories
 
-Directory WAND is a Python CLI tool for creating a large number of directories and executing commands in them. 
+Directory WAND is a Python CLI tool for creating a large number of directories from a single template and executing commands globally throughout every directory.
 
 ## Installation
 
-To install Directory WAND simply run
+To install WAND simply run
 
 ``` sh
 pip install .
 ```
 
-in the root directory of Directory WAND. This will install the `dir-wand` tool. 
+in the root directory of WAND. This will install the `dir-wand` CLI. 
 
-## Creating directories
+## Using WAND to make arbitrarily many directories
 
-Simply create a template directory structure containing what ever files you need and wave your directory wand.
+To use WAND you first need have a template directory structure you want to make copies of. A template directory can include any number of subdirectories and files. WAND will correctly handle the copying of:
+
+- Empty directories.
+- Executables with the correct permissions.
+- Softlinks.
+- Human readable text files (e.g. `.txt`, `.yaml`, `.csv`, `.html`, etc.).
+- Binary files.
+- And many more...
+
+Templates can include any number of "placeholder" values in file paths and inside text files. A placeholder is defined by a set of curly braces containing the place holder label (e.g. `{value1}`).
+
+For example, your template directory might be:
+
+```
+└── simple_example_{num}/
+    ├── simple_example_{num}.yaml
+    ├── nested_dir/
+    │   ├── some_text.txt
+    │   └── another_nested_dir/
+    │       └── another_another_dir/
+    │           └── nested_file.txt
+    └── empty_dir/
+```
+
+where `num` is one of the placeholders and we have a mixture of directories and files with and without placeholders in their name. 
+
+To include placeholders in a file we can again use the curly brace notation. For instance, in this example we have `simple_example_{num}.yaml` which could contain:
+
+``` yaml
+PlaceHolders:
+  run:              {num}
+  variable:         {x}
+  another_variable: {y}
+  some_flag:        {flag}
+```
+
+To make copies of this template directory we can use the `dir-wand` CLI tool. `dir-wand` needs a set of values for each placeholder along with the path to the template directory, e.g.:
+
+``` sh
+dir-wand simple_example_{num}/ --root /where/to/put/copies/ --num 0-2 --x 1-3 --y 2-4 -flag 0 1 0
+```
+
+Here we've passed the filepath to the template directory (which can be an absolute or relative path), an optional root for the copies (if not given the copies will be made in the directory the command was run in) and a set of key-value pairs for each placeholder (of the form --key value). These values can be:
+
+- The definition of an inclusive range using 2 dashes (e.g. `--num 0-2` will replace `num` values of 0, 1, and 2).
+- A list of values using 1 dash (e.g. `-flag 0 1 0` will replace `flag` with 0, 1, and 0).
+
+NOTE: The number of values for each placeholder must be the same. If not, WAND will raise an error.
+
+This will create 3 directories in `/where/to/put/copies/`:
+
+```
+├── simple_example_0/
+│   ├── simple_example_0.yaml
+│   ├── nested_dir/
+│   │   ├── some_text.txt
+│   │   └── another_nested_dir/
+│   │       └── another_another_dir/
+│   │           └── nested_file.txt
+│   └── empty_dir/
+├── simple_example_1/
+│   ├── simple_example_1.yaml
+│   ├── nested_dir/
+│   │   ├── some_text.txt
+│   │   └── another_nested_dir/
+│   │       └── another_another_dir/
+│   │           └── nested_file.txt
+│   └── empty_dir/
+└── simple_example_2/
+    ├── simple_example_2.yaml
+    ├── nested_dir/
+    │   ├── some_text.txt
+    │   └── another_nested_dir/
+    │       └── another_another_dir/
+    │           └── nested_file.txt
+    └── empty_dir/
+```
+
+and `simple_example_0.yaml` will contain:
+
+``` yaml
+PlaceHolders:
+  run:              0
+  variable:         1
+  another_variable: 2
+  some_flag:        0
+```
+
+with the other files made accordingly.
 
 ## Running commands
+
+Coming soon...
