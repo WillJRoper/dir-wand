@@ -21,15 +21,13 @@ def main():
     # Get the arguments
     args = parser.parse_args()
 
-    # Report what we found
-    print("Template:", args.template)
-    print("Root:", args.root)
-    for key, value in args.replacements.items():
-        print(f"Replacement: {key} = {value}")
-
     # Create the template
-    template = Template(args.template, **args.replacements)
+    template = Template(args.template, run=args.run, **args.replacements)
+
+    # Give some feedback
     print(template)
+    print("Template structure:")
+    print(template.directory)
 
     # Make the copy
     template.make_copies(args.root)

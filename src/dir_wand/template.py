@@ -64,10 +64,6 @@ class Template:
         self.directory = Directory(self.root_path)
         self.directory.unpack_contents()
 
-        # Print the directory structure
-        print("Template structure:")
-        print(self.directory)
-
         # Parse the swaps, we'll store these in a dictionary
         self.swaps = self.parse_swaps(**swaps)
         self.nswap_vars = len(self.swaps)
