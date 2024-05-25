@@ -98,7 +98,7 @@ class Parser(argparse.ArgumentParser):
         self.add_argument(
             "--run",
             type=str,
-            help="A command to run in each copy once the copy is complete."
+            help="A command to run in each copy once the copy is complete. "
             "The command will be run in the current working directory.",
             default=None,
         )
@@ -174,7 +174,5 @@ class Parser(argparse.ArgumentParser):
                 args.replacements[key] = values
             else:
                 unknown_args.pop(0)
-
-        print(args.run)
 
         return args
