@@ -25,7 +25,11 @@ in the root directory of WAND. This will install the `dir-wand` CLI.
 
 ## Using WAND to make arbitrarily many directories
 
-To use WAND you first need have a template directory structure you want to make copies of. A template directory can include any number of subdirectories and files. WAND will correctly handle the copying of:
+WAND can efficiently make an arbitrary number of complex directory structures from a single template directory. This can be useful for creating a large number of directories with similar structures, such as for running many simulations, performance testing, or experiments. In the sections below we'll show how to create a template directory structure and use WAND to make copies of this structure with placeholders populated by a set of values.
+
+### Creating a template
+
+A template directory can include any number of subdirectories and files. WAND will correctly handle the copying of:
 
 - Empty directories.
 - Executables with the correct permissions.
@@ -62,17 +66,21 @@ PlaceHolders:
   some_flag:        {flag}
 ```
 
+where `num`, `x`, `y`, and `flag` are placeholders that will be replaced by values when making copies of the template directory.
+
+### Making copies
+
 To make copies of this template directory we can use the `dir-wand` CLI tool. `dir-wand` needs a set of values for each placeholder along with the path to the template directory, e.g.:
 
 ``` sh
 dir-wand --template simple_example_{num}/ --root /where/to/put/copies/ --num 0-2 --x 1-3 --y 2-4 -flag 0 1 0
 ```
 
-Here we've passed the filepath to the template directory (which can be an absolute or relative path), an optional root for the copies (if not given the copies will be made in the current working directory) and a set of key-value pairs for each placeholder (of the form --key value). These values can be:
+Here we've passed the filepath to the template directory (which can be an absolute or relative path), an _optional_ root directory to contain the copies (if not given the copies will be made in the current working directory) and a set of key-value pairs for each placeholder (of the form --key value). These values can be:
 
 - The definition of an inclusive range using 2 dashes (e.g. `--num 0-2` will replace `num` with values of 0, 1, and 2).
 - A list of values using 1 dash (e.g. `-flag 0 1 0` will replace `flag` with 0, 1, and 0).
-- The path to a file containing a list of strings (Coming soon...).
+- The path to a file containing a list of strings using 2 dashes (for details see below).
 
 NOTE: The number of values for each placeholder must be the same. If not, WAND will raise an error.
 
@@ -118,9 +126,49 @@ PlaceHolders:
 
 with the other files made accordingly.
 
+#### Using a file for values
+
+Rather than explicitly stating the values for a placeholder, you can pass the path to a file containing a list of values. For example, if we have a file `values.txt` containing values split by newlines,
+
+```
+0
+1
+0
+```
+
+we could instead pass this file to the flag argument,
+
+``` sh
+dir-wand --template simple_example_{num}/ --root /where/to/put/copies/ --num 0-2 --x 1-3 --y 2-4 --flag values.txt
+```
+
+which will create the same directories as before.
+
 ### Using a swap file
 
-Coming soon...
+If you have a large number of placeholders or a large number of values for placeholders, it could be cumbersome to pass them all as arguments. Instead, you can pass a "swapfile", a yaml file defining the values to swap with each placeholder. If we have a swapfile `swapfile.yaml` containing:
+
+``` yaml
+num:
+  range: 0-2
+x:
+  list:
+    - 1
+    - 2
+    - 3
+y:
+  range: 2-4
+flag:
+  file: values.txt
+```
+
+we could instead pass this file to the `--swapfile` argument,
+
+``` sh
+dir-wand --template simple_example_{num}/ --root /where/to/put/copies/ --swapfile swapfile.yaml
+```
+
+ignoring the need to pass the placeholders as arguments explictly to get the same result as the calls detailed above. This not only makes working with a large number of placeholders easier but also allows for easy reuse of the same values across different runs.
 
 ### Running commands after a copy
 
@@ -144,7 +192,7 @@ These commands can be any valid shell command or even a script. The commands wil
 
 WAND can also be used to run commands in existing directories with identical structures and "placeholder compliant" naming. 
 
-This can be done by passing the `--run` argument including placeholders and any required swaps. For example, if we assume the example template directory above is already made, where we have the directories (including all their contents):
+This can be done by passing the `--run` argument including placeholders and any required swaps (which can be defined in any of the ways detailed above including a swapfile). For example, if we assume the example template directory above is already made, where we have the directories (including all their contents):
 
 ```
 ├── simple_example_0/

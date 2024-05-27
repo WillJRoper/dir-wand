@@ -14,8 +14,7 @@ license = { file = "LICENSE" }
 # Minimum Python version
 requires-python = ">=3.8"
 
-# No dependencies to run
-dependencies = []
+dependencies = ["pyyaml"]
 
 classifiers = [
     "Development Status :: 4 - Beta",

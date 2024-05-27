@@ -4,9 +4,65 @@ This module contains the Parser class for parsing command line arguments. The
 Parser class is a wrapper around the argparse.ArgumentParser class that adds
 some standardised arguments and enables arbitrarily many arbitrarily named
 arguments.
+
+Example:
+    To use the Parser class, simply create an instance of the class and call
+    the parse_args method. This will return a namespace containing the parsed
+    command line arguments.
+
+    >>> parser = Parser(description="A description of the program.")
+    >>> args = parser.parse_args()
 """
 
 import argparse
+import os
+
+import yaml
+
+
+def parse_swapfile(swapfile):
+    """
+    Parse the swapfile.
+
+    Args:
+        swapfile (str):
+            The path to the swapfile.
+
+    Returns:
+        dict:
+            The swaps to make in the template.
+    """
+    # Create a dictionary to store the swaps
+    swaps = {}
+
+    # If we have no swapfile, return an empty dictionary
+    if swapfile is None:
+        return swaps
+
+    # Process the swapfile if given
+    with open(swapfile, "r") as file:
+        swapfile_dict = yaml.safe_load(file)
+
+    # Unpack the contents of the swapfile
+    for key, swap_dict in swapfile_dict.items():
+        # Do we have a list?
+        if swap_dict.get("list") is not None:
+            swaps[key] = swap_dict["list"]
+
+        # Do we have a file?
+        elif swap_dict.get("file") is not None:
+            with open(swap_dict["file"], "r") as file:
+                swaps[key] = file.read().splitlines()
+
+        # Do we have the defintion of a range, i.e. 1-10?
+        elif swap_dict.get("range") is not None:
+            swap_range = swap_dict["range"]
+            start, end = swap_range.split("-")
+            swaps[key] = list(range(int(start), int(end) + 1))
+
+    print(swaps)
+
+    return swaps
 
 
 def parse_swaps(**swaps):
@@ -27,6 +83,11 @@ def parse_swaps(**swaps):
         if isinstance(value, (list, tuple)):
             swaps[key] = value
 
+        # Do we have a file?
+        elif os.path.isfile(value):
+            with open(value, "r") as file:
+                swaps[key] = file.read().splitlines()
+
         # Do we have the defintion of a range, i.e. 1-10?
         elif "-" in value:
             # Split the range
@@ -38,9 +99,13 @@ def parse_swaps(**swaps):
             raise ValueError(f"Invalid swap value: {value}")
 
     # Ensure we have the same number of elements for all swaps
+    length_dict = {key: len(value) for key, value in swaps.items()}
     lengths = {len(value) for value in swaps.values()}
     if len(lengths) > 1:
-        raise ValueError("All swaps must have the same number of elements")
+        raise ValueError(
+            "All swaps must have the same number of elements. "
+            f"Got: {length_dict}"
+        )
 
     return swaps
 
@@ -63,9 +128,9 @@ class StoreDictKeyPair(argparse.Action):
                 The option string.
         """
         key = option_string.lstrip("--")
-        if not hasattr(namespace, "replacements"):
-            setattr(namespace, "replacements", {})
-        getattr(namespace, "replacements")[key] = values
+        if not hasattr(namespace, "swaps"):
+            setattr(namespace, "swaps", {})
+        getattr(namespace, "swaps")[key] = values
 
 
 class StoreListKeyPair(argparse.Action):
@@ -140,10 +205,18 @@ class Parser(argparse.ArgumentParser):
             default=None,
         )
 
+        # Add an optional argument for the swapfile
+        self.add_argument(
+            "--swapfile",
+            type=str,
+            help="A yaml file defining the swaps for each placeholder.",
+            default=None,
+        )
+
         # Add arbitrary arguments
         self.add_argument(
             "--",
-            dest="replacements",
+            dest="swaps",
             action=StoreDictKeyPair,
             nargs=1,
             metavar="VALUE",
@@ -154,7 +227,7 @@ class Parser(argparse.ArgumentParser):
         )
         self.add_argument(
             "-",
-            dest="replacements",
+            dest="swaps",
             action=StoreListKeyPair,
             nargs="+",
             metavar="VALUE",
@@ -174,7 +247,7 @@ class Parser(argparse.ArgumentParser):
         Parse the command line arguments.
 
         This will handle any "unknown" arguments that are passed to the
-        command line by storing them in a dictionary called "replacements"
+        command line by storing them in a dictionary called "swaps"
         attached to the returned namespace.
 
         Returns:
@@ -184,7 +257,8 @@ class Parser(argparse.ArgumentParser):
         # Parse arguments
         args, unknown_args = self.parse_known_args()
 
-        args.replacements = {}
+        # Parse the swapfile (if no swapfile this just returns an empty dict)
+        args.swaps = parse_swapfile(args.swapfile)
 
         # Process unknown_args manually
         while unknown_args:
@@ -196,9 +270,9 @@ class Parser(argparse.ArgumentParser):
                     and not unknown_args[0].startswith("--")
                 ):
                     value = unknown_args.pop(0)
-                    args.replacements[key] = value
+                    args.swaps[key] = value
                 else:
-                    args.replacements[key] = None
+                    args.swaps[key] = None
             elif unknown_args[0].startswith("-"):
                 key = unknown_args.pop(0).lstrip("-")
                 values = []
@@ -208,11 +282,11 @@ class Parser(argparse.ArgumentParser):
                     and not unknown_args[0].startswith("--")
                 ):
                     values.append(unknown_args.pop(0))
-                args.replacements[key] = values
+                args.swaps[key] = values
             else:
                 unknown_args.pop(0)
 
         # Parse the swaps so we have what we need
-        args.replacements = parse_swaps(**args.replacements)
+        args.swaps = parse_swaps(**args.swaps)
 
         return args

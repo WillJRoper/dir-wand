@@ -23,7 +23,7 @@ def copies_main(args):
             The parsed command line arguments.
     """
     # Create the template
-    template = Template(args.template, run=args.run, **args.replacements)
+    template = Template(args.template, run=args.run, **args.swaps)
 
     # Give some feedback
     print(template)
@@ -47,7 +47,7 @@ def run_main(args):
     command_runner = CommandRunner(args.run)
 
     # Run the command for all the swap combinations
-    command_runner.run_command_for_all_swaps(**args.replacements)
+    command_runner.run_command_for_all_swaps(**args.swaps)
 
 
 def main():
