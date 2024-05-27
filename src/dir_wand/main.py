@@ -10,6 +10,7 @@ Example:
 
 from dir_wand.art import ASCII_ART
 from dir_wand.command_runner import CommandRunner
+from dir_wand.logger import Logger
 from dir_wand.parser import Parser
 from dir_wand.template import Template
 
@@ -58,6 +59,9 @@ def main():
 
     # Get the arguments
     args = parser.parse_args()
+
+    # Set up the logger
+    Logger(silent=args.silent)
 
     # Greet
     print()
