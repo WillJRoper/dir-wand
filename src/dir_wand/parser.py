@@ -16,6 +16,7 @@ Example:
 
 import argparse
 import os
+import sys
 
 import yaml
 
@@ -248,7 +249,7 @@ class Parser(argparse.ArgumentParser):
         self.print_help()
         return ""
 
-    def parse_args(self):
+    def parse_args(self, args=None, namespace=None):
         """
         Parse the command line arguments.
 
@@ -256,10 +257,23 @@ class Parser(argparse.ArgumentParser):
         command line by storing them in a dictionary called "swaps"
         attached to the returned namespace.
 
+        Args:
+            args (list):
+                The command line arguments to parse.
+            namespace (argparse.Namespace):
+                The namespace to store the parsed arguments in.
+
         Returns:
             argparse.Namespace:
                 The parsed command line arguments.
         """
+        if args is None:
+            args = sys.argv[1:]
+
+        # If no arguments are provided, display help
+        if not args:
+            self.print_help()
+            self.exit()
         # Parse arguments
         args, unknown_args = self.parse_known_args()
 
