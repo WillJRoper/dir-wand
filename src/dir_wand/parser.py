@@ -210,6 +210,14 @@ class Parser(argparse.ArgumentParser):
             default=None,
         )
 
+        # Add silent mode which will suppress all WAND prints
+        self.add_argument(
+            "--silent",
+            action="store_true",
+            help="Suppress all WAND prints.",
+            default=False,
+        )
+
         # Add arbitrary arguments
         self.add_argument(
             "--",
