@@ -228,7 +228,8 @@ class Parser(argparse.ArgumentParser):
             help="A key-value pair for a placeholder replacement. Should "
             "be in the form --key value, where key is the name ({name}) to "
             "replace in directory paths and files, and value is an "
-            "inclusive range (1-5).",
+            "inclusive range (1-5), or a filepath to a file contain a list."
+            "of values.",
         )
         self.add_argument(
             "-",
