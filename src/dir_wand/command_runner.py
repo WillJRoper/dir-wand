@@ -23,6 +23,9 @@ import threading
 from dir_wand.logger import Logger
 from dir_wand.utils import swap_in_str
 
+# Get the logger
+logger = Logger()
+
 
 class CommandRunner:
     """
@@ -75,7 +78,7 @@ class CommandRunner:
             for match in matches:
                 self._placeholders.add(match)
 
-    @Logger().count("command")
+    @logger.count("command")
     def run_command(self, **swaps):
         """
         Run the command.

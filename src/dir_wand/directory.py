@@ -30,6 +30,9 @@ from dir_wand.file import File
 from dir_wand.logger import Logger
 from dir_wand.utils import swap_in_str
 
+# Get the logger
+logger = Logger()
+
 
 class Directory:
     """
@@ -153,7 +156,7 @@ class Directory:
                 # Add the file to the files
                 self.files.append(f)
 
-    @Logger().count("directory")
+    @logger.count("directory")
     def _make_dir_copy(self, path):
         """
         Make a copy of the directory.

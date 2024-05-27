@@ -26,6 +26,9 @@ import re
 from dir_wand.logger import Logger
 from dir_wand.utils import swap_in_str
 
+# Get the logger
+logger = Logger()
+
 
 class File:
     """
@@ -153,13 +156,13 @@ class File:
                 for match in matches:
                     self._placeholders.add(match)
 
-    @Logger().count("file")
+    @logger.count("file")
     def _make_softlink_copy(self, path):
         """Make a copy of a softlink."""
         link = os.readlink(self.path)
         os.symlink(link, path)
 
-    @Logger().count("file")
+    @logger.count("file")
     def _make_executable_copy(self, path):
         """Make a copy of an executable file."""
         # Copy the file
@@ -170,7 +173,7 @@ class File:
         # Copy the permissions
         os.chmod(path, os.stat(path).st_mode)
 
-    @Logger().count("file")
+    @logger.count("file")
     def _make_simple_copy(self, path):
         """Make a simple copy of a file."""
         # Copy the file
@@ -178,7 +181,7 @@ class File:
             with open(path, "wb") as new_file:
                 new_file.write(file.read())
 
-    @Logger().count("file")
+    @logger.count("file")
     def _make_copy_with_placeholders(self, path, **swaps):
         """
         Make a copy of the file with the placeholders swapped out.
