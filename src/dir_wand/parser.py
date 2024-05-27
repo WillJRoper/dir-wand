@@ -7,6 +7,54 @@ arguments.
 """
 
 import argparse
+import os
+
+import yaml
+
+
+def parse_swapfile(swapfile):
+    """
+    Parse the swapfile.
+
+    Args:
+        swapfile (str):
+            The path to the swapfile.
+
+    Returns:
+        dict:
+            The swaps to make in the template.
+    """
+    # Create a dictionary to store the swaps
+    swaps = {}
+
+    # If we have no swapfile, return an empty dictionary
+    if swapfile is None:
+        return swaps
+
+    # Process the swapfile if given
+    with open(swapfile, "r") as file:
+        swapfile_dict = yaml.safe_load(file)
+
+    # Unpack the contents of the swapfile
+    for key, swap_dict in swapfile_dict.items():
+        # Do we have a list?
+        if swap_dict.get("list") is not None:
+            swaps[key] = swap_dict["list"]
+
+        # Do we have a file?
+        elif swap_dict.get("file") is not None:
+            with open(swap_dict["file"], "r") as file:
+                swaps[key] = file.read().splitlines()
+
+        # Do we have the defintion of a range, i.e. 1-10?
+        elif swap_dict.get("range") is not None:
+            swap_range = swap_dict["range"]
+            start, end = swap_range.split("-")
+            swaps[key] = list(range(int(start), int(end) + 1))
+
+    print(swaps)
+
+    return swaps
 
 
 def parse_swaps(**swaps):
@@ -22,10 +70,14 @@ def parse_swaps(**swaps):
             If the number of swaps isn't equal between all placeholders.
     """
     for key, value in swaps.items():
-        print(key, value)
         # Do we have a list?
         if isinstance(value, (list, tuple)):
             swaps[key] = value
+
+        # Do we have a file?
+        elif os.path.isfile(value):
+            with open(value, "r") as file:
+                swaps[key] = file.read().splitlines()
 
         # Do we have the defintion of a range, i.e. 1-10?
         elif "-" in value:
@@ -140,6 +192,14 @@ class Parser(argparse.ArgumentParser):
             default=None,
         )
 
+        # Add an optional argument for the swapfile
+        self.add_argument(
+            "--swapfile",
+            type=str,
+            help="A yaml file defining the swaps for each placeholder.",
+            default=None,
+        )
+
         # Add arbitrary arguments
         self.add_argument(
             "--",
@@ -184,7 +244,8 @@ class Parser(argparse.ArgumentParser):
         # Parse arguments
         args, unknown_args = self.parse_known_args()
 
-        args.replacements = {}
+        # Parse the swapfile (if no swapfile this just returns an empty dict)
+        args.replacements = parse_swapfile(args.swapfile)
 
         # Process unknown_args manually
         while unknown_args:
