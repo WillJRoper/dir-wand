@@ -82,21 +82,6 @@ class Template:
         """
         return f"Waving the directory WAND on {self.root_path}..."
 
-    @staticmethod
-    def swap_str(swap):
-        """
-        Return a string representation of a set of swaps.
-
-        Args:
-            swap (dict):
-                The swap dictionary.
-
-        Returns:
-            str:
-                The string representation of the swap.
-        """
-        return ",\n".join(f"    {key}: {value}" for key, value in swap.items())
-
     def make_copies(self, new_root):
         """
         Make copies of the template.
@@ -115,20 +100,33 @@ class Template:
             for i in range(self.nswaps)
         ]
 
+        print(f"Copying {self.root}...")
+
+        # Set up the header of the table we'll print
+        header = f" {'#':<5} "
+        for swap in self.swaps:
+            header += f" {swap:<20} "
+        print(header)
+        print("-" * len(header))
+
         # Loop over the swaps we'll have to make
-        for swap in swaps:
+        for i, swap in enumerate(swaps):
             # Make a copy of the root directory, this will recursively copy all
             # the files and directories handling the swaps
             self.directory.make_copy_with_swaps(new_root, **swap)
 
-            print("Copy made for {\n" + self.swap_str(swap) + "\n}")
+            # Print the swap
+            line = f" {i:<5} "
+            for key in swap:
+                line += f" {swap[key]:<20} "
+            print(line)
 
             # If we have a command to run, run it (this will be done on a
             # concurrent thread so we don't block the main thread)
             if self.run_cmd is not None:
                 self.run_cmd.run_command(**swap)
 
-            print()
+        print("-" * len(header))
 
         # Wait for the command threads before exiting if we need to
         if self.run_cmd is not None:
