@@ -207,3 +207,24 @@ dir-wand --run "cd simple_example_{num}; head -2 simple_example_{num}.yaml" --nu
 ```
 
 This will output the first 2 lines of each `simple_example_{num}.yaml` file in each directory. Note that any command passed to `--run` will be run in the current working directory. 
+
+## Runtime arguments
+
+Invoking `dir-wand` with the `--help` flag (or not arguments at all) will display all possible options:
+
+```
+usage: dir-wand [-h] [--template TEMPLATE] [--root ROOT] [--run RUN] [--swapfile SWAPFILE] [--silent] [-- VALUE] [- VALUE [VALUE ...]]
+
+Wave your Directory WAND and make magic happen.
+
+options:
+  -h, --help           show this help message and exit
+  --template TEMPLATE  The template to use for the model.
+  --root ROOT          The root directory for the outputs.
+  --run RUN            A command to run in each copy once the copy is complete. The command will be run in the current working directory.
+  --swapfile SWAPFILE  A yaml file defining the swaps for each placeholder.
+  --silent             Suppress all WAND prints.
+  -- VALUE             A key-value pair for a placeholder replacement. Should be in the form --key value, where key is the name ({name}) to replace in directory paths and files, and value is an inclusive range (1-5), or a filepath to a file contain a list.of values.
+  - VALUE [VALUE ...]  A key-value pair for a placeholder replacement. Should be in the form -key value1 value2 value3, where key is the name ({name}) to replace in directory paths and files, and value is a list.
+```
+
