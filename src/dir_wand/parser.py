@@ -4,6 +4,14 @@ This module contains the Parser class for parsing command line arguments. The
 Parser class is a wrapper around the argparse.ArgumentParser class that adds
 some standardised arguments and enables arbitrarily many arbitrarily named
 arguments.
+
+Example:
+    To use the Parser class, simply create an instance of the class and call
+    the parse_args method. This will return a namespace containing the parsed
+    command line arguments.
+
+    >>> parser = Parser(description="A description of the program.")
+    >>> args = parser.parse_args()
 """
 
 import argparse
@@ -120,9 +128,9 @@ class StoreDictKeyPair(argparse.Action):
                 The option string.
         """
         key = option_string.lstrip("--")
-        if not hasattr(namespace, "replacements"):
-            setattr(namespace, "replacements", {})
-        getattr(namespace, "replacements")[key] = values
+        if not hasattr(namespace, "swaps"):
+            setattr(namespace, "swaps", {})
+        getattr(namespace, "swaps")[key] = values
 
 
 class StoreListKeyPair(argparse.Action):
@@ -208,7 +216,7 @@ class Parser(argparse.ArgumentParser):
         # Add arbitrary arguments
         self.add_argument(
             "--",
-            dest="replacements",
+            dest="swaps",
             action=StoreDictKeyPair,
             nargs=1,
             metavar="VALUE",
@@ -219,7 +227,7 @@ class Parser(argparse.ArgumentParser):
         )
         self.add_argument(
             "-",
-            dest="replacements",
+            dest="swaps",
             action=StoreListKeyPair,
             nargs="+",
             metavar="VALUE",
@@ -239,7 +247,7 @@ class Parser(argparse.ArgumentParser):
         Parse the command line arguments.
 
         This will handle any "unknown" arguments that are passed to the
-        command line by storing them in a dictionary called "replacements"
+        command line by storing them in a dictionary called "swaps"
         attached to the returned namespace.
 
         Returns:
@@ -250,7 +258,7 @@ class Parser(argparse.ArgumentParser):
         args, unknown_args = self.parse_known_args()
 
         # Parse the swapfile (if no swapfile this just returns an empty dict)
-        args.replacements = parse_swapfile(args.swapfile)
+        args.swaps = parse_swapfile(args.swapfile)
 
         # Process unknown_args manually
         while unknown_args:
@@ -262,9 +270,9 @@ class Parser(argparse.ArgumentParser):
                     and not unknown_args[0].startswith("--")
                 ):
                     value = unknown_args.pop(0)
-                    args.replacements[key] = value
+                    args.swaps[key] = value
                 else:
-                    args.replacements[key] = None
+                    args.swaps[key] = None
             elif unknown_args[0].startswith("-"):
                 key = unknown_args.pop(0).lstrip("-")
                 values = []
@@ -274,11 +282,11 @@ class Parser(argparse.ArgumentParser):
                     and not unknown_args[0].startswith("--")
                 ):
                     values.append(unknown_args.pop(0))
-                args.replacements[key] = values
+                args.swaps[key] = values
             else:
                 unknown_args.pop(0)
 
         # Parse the swaps so we have what we need
-        args.replacements = parse_swaps(**args.replacements)
+        args.swaps = parse_swaps(**args.swaps)
 
         return args
