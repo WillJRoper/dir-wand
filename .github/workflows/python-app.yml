@@ -39,8 +39,8 @@ jobs:
         dir-wand --template tests/simple_test_{num}  --root tests/results/ --num 0-4 -x 1 2 3 4 5 --y 9-13 -flag 0 0 0 1 1
         rm -r tests/results/*
         # Simple test of template copying in silent mode
-        dir-wand --template tests/simple_test_{num}  --root tests/results/ --num 0-4 -x 1 2 3 4 5 --y 9-13 -flag 0 0 0 1 1
-        rm -r tests/results/* --silent
+        dir-wand --template tests/simple_test_{num}  --root tests/results/ --num 0-4 -x 1 2 3 4 5 --y 9-13 -flag 0 0 0 1 1 --silent
+        rm -r tests/results/*
         # Simple test of runnning a command after copy
         dir-wand --template tests/simple_test_{num}  --root tests/results/ --num 0-2 -x 1 2 3 --y 9-11 -flag 0 0 0 --run "cd tests/results/simple_test_{num}; cat simple_test_{num}.yaml; cat nested_dir/another_nested_dir/another_another_dir/nested_file.txt"
         # Simple running of a command in existing directories
