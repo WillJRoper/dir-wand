@@ -5,12 +5,26 @@ instance. The commands are run in the context of the template root directory.
 
 The command runner uses concurrent threads to run the commands in parallel.
 
+Example:
+    # Create a command runner instance
+    command_runner = CommandRunner("echo {placeholder}")
 
+    # Run the command
+    command_runner.run_command(placeholder="Hello, World!")
+
+    # Wait for the command to complete
+    command_runner.wait_for_all()
 """
 
 import os
 import re
 import threading
+
+from dir_wand.logger import Logger
+from dir_wand.utils import swap_in_str
+
+# Get the logger
+logger = Logger()
 
 
 class CommandRunner:
@@ -64,6 +78,7 @@ class CommandRunner:
             for match in matches:
                 self._placeholders.add(match)
 
+    @logger.count("command")
     def run_command(self, **swaps):
         """
         Run the command.
@@ -89,11 +104,10 @@ class CommandRunner:
             raise ValueError(f"Missing placeholders: {missing}")
 
         # Replace any swaps in the command
-        command = self.command.format(**swaps)
+        command = swap_in_str(self.command, **swaps)
 
         # Function to run the command
         def run():
-            print(f"Running command: {command}")
             try:
                 status = os.system(command)
                 if status != 0:

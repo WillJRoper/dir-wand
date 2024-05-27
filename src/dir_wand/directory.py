@@ -27,6 +27,11 @@ Example:
 import os
 
 from dir_wand.file import File
+from dir_wand.logger import Logger
+from dir_wand.utils import swap_in_str
+
+# Get the logger
+logger = Logger()
 
 
 class Directory:
@@ -151,6 +156,17 @@ class Directory:
                 # Add the file to the files
                 self.files.append(f)
 
+    @logger.count("directory")
+    def _make_dir_copy(self, path):
+        """
+        Make a copy of the directory.
+
+        Args:
+            path (str):
+                The path to the new directory.
+        """
+        os.makedirs(path, exist_ok=True)
+
     def make_copy_with_swaps(self, path, **swaps):
         """
         Make a copy of the directory with the placeholders swapped out.
@@ -163,10 +179,11 @@ class Directory:
         """
         # Get the new file path handling any possible placeholders
         path += "/" if not path.endswith("/") else ""
-        path = path + self.name.format(**swaps)
+        path = path + self.name
+        path = swap_in_str(path, **swaps)
 
         # Make the new directory
-        os.makedirs(path, exist_ok=True)
+        self._make_dir_copy(path)
 
         # Iterate over the files
         for file in self.files:

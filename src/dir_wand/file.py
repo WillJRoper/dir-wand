@@ -23,6 +23,12 @@ Example:
 import os
 import re
 
+from dir_wand.logger import Logger
+from dir_wand.utils import swap_in_str
+
+# Get the logger
+logger = Logger()
+
 
 class File:
     """
@@ -150,6 +156,67 @@ class File:
                 for match in matches:
                     self._placeholders.add(match)
 
+    @logger.count("file")
+    def _make_softlink_copy(self, path):
+        """Make a copy of a softlink."""
+        link = os.readlink(self.path)
+        os.symlink(link, path)
+
+    @logger.count("file")
+    def _make_executable_copy(self, path):
+        """Make a copy of an executable file."""
+        # Copy the file
+        with open(self.path, "rb") as file:
+            with open(path, "wb") as new_file:
+                new_file.write(file.read())
+
+        # Copy the permissions
+        os.chmod(path, os.stat(path).st_mode)
+
+    @logger.count("file")
+    def _make_simple_copy(self, path):
+        """Make a simple copy of a file."""
+        # Copy the file
+        with open(self.path, "rb") as file:
+            with open(path, "wb") as new_file:
+                new_file.write(file.read())
+
+    @logger.count("file")
+    def _make_copy_with_placeholders(self, path, **swaps):
+        """
+        Make a copy of the file with the placeholders swapped out.
+
+        This method will only work if the file has placeholders.
+
+        Args:
+            path (str):
+                The path to save the new file.
+            **swaps:
+                The placeholders to swap out.
+        """
+        # Ensure we have all the placeholders before we start swapping
+        missing = self._placeholders - set(swaps.keys())
+        if len(missing) > 0:
+            raise ValueError(f"Missing placeholders: {missing}")
+
+        # Open the file and read the lines
+        with open(self.path, "r") as file:
+            lines = file.readlines()
+
+        # Iterate over the lines and swap out the placeholders
+        for index in self._place_holder_lines:
+            # Get the line
+            line = lines[index]
+
+            line = swap_in_str(line, **swaps)
+
+            # Update the line
+            lines[index] = line
+
+        # Write the new file
+        with open(path, "w") as file:
+            file.writelines(lines)
+
     def make_copy_with_swaps(self, path, **swaps):
         """
         Make a copy of the file with the placeholders swapped out.
@@ -166,56 +233,25 @@ class File:
         """
         # Get the new file path handling any possible placeholders
         path += "/" if not path.endswith("/") else ""
-        path = path + self.name.format(**swaps)
+        path = path + self.name
+        path = swap_in_str(path, **swaps)
 
         # Before checking for swaps we might have a softlink, so we need to
         # copy the link
         if self.is_softlink:
-            link = os.readlink(self.path)
-            os.symlink(link, path)
+            self._make_softlink_copy(path)
             return
 
         # We might have an executable file, so we need to copy the permissions
         # and then the file
         if self.is_executable:
-            # Copy the file
-            with open(self.path, "rb") as file:
-                with open(path, "wb") as new_file:
-                    new_file.write(file.read())
-
-            # Copy the permissions
-            os.chmod(path, os.stat(path).st_mode)
+            self._make_executable_copy(path)
             return
 
         # We might only need to make a straight copy
         if not self.has_placeholders:
-            # Copy the file
-            with open(self.path, "rb") as file:
-                with open(path, "wb") as new_file:
-                    new_file.write(file.read())
+            self._make_simple_copy(path)
             return
 
         # OK, we dont have a simple case, lets handle the placeholders
-
-        # Ensure we have all the placeholders before we start swapping
-        missing = self._placeholders - set(swaps.keys())
-        if len(missing) > 0:
-            raise ValueError(f"Missing placeholders: {missing}")
-
-        # Open the file and read the lines
-        with open(self.path, "r") as file:
-            lines = file.readlines()
-
-        # Iterate over the lines and swap out the placeholders
-        for index in self._place_holder_lines:
-            # Get the line
-            line = lines[index]
-
-            line = line.format(**swaps)
-
-            # Update the line
-            lines[index] = line
-
-        # Write the new file
-        with open(path, "w") as file:
-            file.writelines(lines)
+        self._make_copy_with_placeholders(path, **swaps)
