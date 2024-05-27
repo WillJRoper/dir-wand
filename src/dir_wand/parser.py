@@ -60,8 +60,6 @@ def parse_swapfile(swapfile):
             start, end = swap_range.split("-")
             swaps[key] = list(range(int(start), int(end) + 1))
 
-    print(swaps)
-
     return swaps
 
 
@@ -78,7 +76,6 @@ def parse_swaps(**swaps):
             If the number of swaps isn't equal between all placeholders.
     """
     for key, value in swaps.items():
-        print(key, value)
         # Do we have a list?
         if isinstance(value, (list, tuple)):
             swaps[key] = value
