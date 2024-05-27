@@ -70,6 +70,7 @@ def parse_swaps(**swaps):
             If the number of swaps isn't equal between all placeholders.
     """
     for key, value in swaps.items():
+        print(key, value)
         # Do we have a list?
         if isinstance(value, (list, tuple)):
             swaps[key] = value
@@ -90,9 +91,13 @@ def parse_swaps(**swaps):
             raise ValueError(f"Invalid swap value: {value}")
 
     # Ensure we have the same number of elements for all swaps
+    length_dict = {key: len(value) for key, value in swaps.items()}
     lengths = {len(value) for value in swaps.values()}
     if len(lengths) > 1:
-        raise ValueError("All swaps must have the same number of elements")
+        raise ValueError(
+            "All swaps must have the same number of elements. "
+            f"Got: {length_dict}"
+        )
 
     return swaps
 
