@@ -9,10 +9,8 @@ Example:
 """
 
 from dir_wand.art import ASCII_ART
-from dir_wand.command_runner import CommandRunner
 from dir_wand.logger import Logger
 from dir_wand.parser import Parser
-from dir_wand.template import Template
 
 
 def copies_main(args):
@@ -23,6 +21,10 @@ def copies_main(args):
         args (Namespace):
             The parsed command line arguments.
     """
+    # Delay import to ensure Logger is instantiated before we import
+    # modules that use it's decorators
+    from dir_wand.template import Template
+
     # Create the template
     template = Template(args.template, run=args.run, **args.swaps)
 
@@ -44,6 +46,10 @@ def run_main(args):
         args (Namespace):
             The parsed command line arguments.
     """
+    # Delay import to ensure Logger is instantiated before we import
+    # modules that use it's decorators
+    from dir_wand.command_runner import CommandRunner
+
     # Create the command runner
     command_runner = CommandRunner(args.run)
 
@@ -75,5 +81,5 @@ def main():
         # Otherwise, we're simply running a command
         run_main(args)
 
-    # Report we're done
-    print("Done!")
+    # Report what we've done
+    Logger().report()
