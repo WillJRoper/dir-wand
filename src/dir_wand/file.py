@@ -236,22 +236,22 @@ class File:
         path = path + self.name
         path = swap_in_str(path, **swaps)
 
-        # Before checking for swaps we might have a softlink, so we need to
-        # copy the link
-        if self.is_softlink:
-            self._make_softlink_copy(path)
+        # If we have placeholders we need to swap them out. We can do this
+        # first since inherently a softlink or executable file won't have
+        # placeholders
+        if self.has_placeholders:
+            self._make_copy_with_placeholders(path, **swaps)
             return
 
-        # We might have an executable file, so we need to copy the permissions
-        # and then the file
-        if self.is_executable:
+        # Handle the special cases of a softlink or executable file. In the
+        # former we just need to make a new copy of the softlink, in the latter
+        # we need to copy the file and permissions
+        elif self.is_softlink:
+            self._make_softlink_copy(path)
+            return
+        elif self.is_executable:
             self._make_executable_copy(path)
             return
 
-        # We might only need to make a straight copy
-        if not self.has_placeholders:
-            self._make_simple_copy(path)
-            return
-
-        # OK, we dont have a simple case, lets handle the placeholders
-        self._make_copy_with_placeholders(path, **swaps)
+        # Otherwise we just make a simple copy
+        self._make_simple_copy(path)
