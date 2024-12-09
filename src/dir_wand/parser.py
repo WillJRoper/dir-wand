@@ -272,6 +272,8 @@ class Parser(argparse.ArgumentParser):
         # we're creating a swapfile instead so we can ignore this step
         if args.template is not None:
             args.swaps = parse_swapfile(args.swapfile)
+        else:
+            args.swaps = {}
 
         # Process unknown_args manually
         while unknown_args:
