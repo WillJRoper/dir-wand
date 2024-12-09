@@ -10,18 +10,17 @@
   <img src="https://github.com/WillJRoper/dir-wand/assets/40025495/8ad6d775-c7e8-45df-88bd-21511d6ce6f1" alt="wand-logo" height="300">
 </p>
 
-
 WAND is a Python CLI tool for creating a large number of directories from a single template and executing commands globally throughout every directory.
 
 ## Installation
 
 To install WAND simply run
 
-``` sh
+```sh
 pip install dir-wand
 ```
 
-in the root directory of WAND. This will install the `dir-wand` CLI. 
+in the root directory of WAND. This will install the `dir-wand` CLI.
 
 ## Using WAND to make arbitrarily many directories
 
@@ -53,17 +52,17 @@ For example, your template directory might be:
     └── empty_dir/
 ```
 
-where `num` is one of the placeholders and we have a mixture of directories and files with and without placeholders in their name. 
+where `num` is one of the placeholders and we have a mixture of directories and files with and without placeholders in their name.
 
 To include placeholders in a file we can again use the curly brace notation. For instance, in this example we have `simple_example_{num}.yaml` which could contain:
 
-``` yaml
+```yaml
 PlaceHolders:
-  run_number:       {num}
-  run_directory:    simple_example_{num}
-  variable:         {x}
-  another_variable: {y}
-  some_flag:        {flag}
+  run_number: { num }
+  run_directory: simple_example_{num}
+  variable: { x }
+  another_variable: { y }
+  some_flag: { flag }
 ```
 
 where `num`, `x`, `y`, and `flag` are placeholders that will be replaced by values when making copies of the template directory.
@@ -72,7 +71,7 @@ where `num`, `x`, `y`, and `flag` are placeholders that will be replaced by valu
 
 To make copies of this template directory we can use the `dir-wand` CLI tool. `dir-wand` needs a set of values for each placeholder along with the path to the template directory, e.g.:
 
-``` sh
+```sh
 dir-wand --template simple_example_{num}/ --root /where/to/put/copies/ --num 0-2 --x 1-3 --y 2-4 -flag 0 1 0
 ```
 
@@ -115,13 +114,13 @@ This will create 3 directories in `/where/to/put/copies/`:
 
 and `simple_example_0.yaml` will contain:
 
-``` yaml
+```yaml
 PlaceHolders:
-  run_number:       0
-  run_directory:    simple_example_0
-  variable:         1
+  run_number: 0
+  run_directory: simple_example_0
+  variable: 1
   another_variable: 2
-  some_flag:        0
+  some_flag: 0
 ```
 
 with the other files made accordingly.
@@ -138,7 +137,7 @@ Rather than explicitly stating the values for a placeholder, you can pass the pa
 
 we could instead pass this file to the flag argument,
 
-``` sh
+```sh
 dir-wand --template simple_example_{num}/ --root /where/to/put/copies/ --num 0-2 --x 1-3 --y 2-4 --flag values.txt
 ```
 
@@ -148,7 +147,7 @@ which will create the same directories as before.
 
 If you have a large number of placeholders or a large number of values for placeholders, it could be cumbersome to pass them all as arguments. Instead, you can pass a "swapfile", a yaml file defining the values to swap with each placeholder. If we have a swapfile `swapfile.yaml` containing:
 
-``` yaml
+```yaml
 num:
   range: 0-2
 x:
@@ -162,19 +161,31 @@ flag:
   file: values.txt
 ```
 
-we could instead pass this file to the `--swapfile` argument,
+we can pass this file to the `--swapfile` argument like so,
 
-``` sh
+```sh
 dir-wand --template simple_example_{num}/ --root /where/to/put/copies/ --swapfile swapfile.yaml
 ```
 
-ignoring the need to pass the placeholders as arguments explictly to get the same result as the calls detailed above. This not only makes working with a large number of placeholders easier but also allows for easy reuse of the same values across different runs.
+ignoring the need to pass the placeholders as arguments explictly to get the same result as the calls detailed above.
+
+### Creating a swap file
+
+Of course, if we do have a lot of place holders and want combinations of them its still tedious to write out the swapfile. WAND streamlines this process by providing a method to create swapfiles.
+
+If we pass the `--swapfile` argument but omit the `--template` argument we can provide the swaps we want every possible combination of in our file. For instance,
+
+```sh
+dir-wand --swapfile swapfile.yaml --num 0-1 --num2 0-1
+```
+
+Will create a swapfile containing 4 sets of swaps (0, 0), (0, 1), (1, 0), and (1, 1) for `num` and `num2` respectively. The swaps defined here can also come from a file as shown above.
 
 ### Running commands after a copy
 
 When making copies of a template directory, WAND can also run commands in each directory. This can be done by passing the `--run` argument followed by the command to run wrapped by `"`. For example:
 
-``` sh
+```sh
 dir-wand --template simple_example_{num}/ --root /where/to/put/copies/ --num 0-2 --x 1-3 --y 2-4 -flag 0 1 0 --run "echo 'Hello from simple_example_{num}'"
 ```
 
@@ -190,7 +201,7 @@ These commands can be any valid shell command or even a script. The commands wil
 
 ## Using WAND to run commands in existing directories
 
-WAND can also be used to run commands in existing directories with identical structures and "placeholder compliant" naming. 
+WAND can also be used to run commands in existing directories with identical structures and "placeholder compliant" naming.
 
 This can be done by passing the `--run` argument including placeholders and any required swaps (which can be defined in any of the ways detailed above including a swapfile). For example, if we assume the example template directory above is already made, where we have the directories (including all their contents):
 
@@ -202,11 +213,11 @@ This can be done by passing the `--run` argument including placeholders and any 
 
 Then we can run a command in each directory using:
 
-``` sh
+```sh
 dir-wand --run "cd simple_example_{num}; head -2 simple_example_{num}.yaml" --num 0-2
 ```
 
-This will output the first 2 lines of each `simple_example_{num}.yaml` file in each directory. Note that any command passed to `--run` will be run in the current working directory. 
+This will output the first 2 lines of each `simple_example_{num}.yaml` file in each directory. Note that any command passed to `--run` will be run in the current working directory.
 
 ## Runtime arguments
 
@@ -227,4 +238,3 @@ options:
   -- VALUE             A key-value pair for a placeholder replacement. Should be in the form --key value, where key is the name ({name}) to replace in directory paths and files, and value is an inclusive range (1-5), or a filepath to a file contain a list.of values.
   - VALUE [VALUE ...]  A key-value pair for a placeholder replacement. Should be in the form -key value1 value2 value3, where key is the name ({name}) to replace in directory paths and files, and value is a list.
 ```
-
