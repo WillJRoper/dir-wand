@@ -268,12 +268,15 @@ class Parser(argparse.ArgumentParser):
         # Parse arguments
         args, unknown_args = self.parse_known_args()
 
-        # Parse the swapfile. If we have a swapfile but no template then
+        # Parse the swapfile. If we have a swapfile but no template or run then
         # we're creating a swapfile instead so we can ignore this step
-        if args.template is not None:
+        if args.template is not None or args.run is not None:
             args.swaps = parse_swapfile(args.swapfile)
         else:
             args.swaps = {}
+
+            # When creating a swapfile we want to be silent
+            args.silent = True
 
         # Process unknown_args manually
         while unknown_args:

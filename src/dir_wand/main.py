@@ -115,7 +115,7 @@ def main():
 
     # If we have no template but have been given a swapfile, we're creating
     # a swapfile
-    elif args.swapfile is not None:
+    elif args.swapfile is not None and args.run is None:
         swapfile_main(args)
         return  # no point in reporting
 
