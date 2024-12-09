@@ -40,9 +40,12 @@ def parse_swapfile(swapfile):
     if swapfile is None:
         return swaps
 
-    # Process the swapfile if given
-    with open(swapfile, "r") as file:
-        swapfile_dict = yaml.safe_load(file)
+    # Process the swapfile if it already exists
+    if not os.path.isfile(swapfile):
+        with open(swapfile, "r") as file:
+            swapfile_dict = yaml.safe_load(file)
+    else:
+        return swaps
 
     # Unpack the contents of the swapfile
     for key, swap_dict in swapfile_dict.items():
