@@ -62,17 +62,17 @@ def get_swap_combos(swaps):
     return transposed
 
 
-def make_swapfile(swaps, yaml_path):
+def make_swapfile(yaml_path, swaps):
     """
     Make a swapfile from the swaps.
 
     This will create a yaml file with all possible combinations of the swaps.
 
     Args:
-        swaps (dict):
-            The swaps to get the combinations for.
         yaml_path (str):
             The path to the yaml file to write.
+        swaps (dict):
+            The swaps to get the combinations for.
 
     Returns:
         dict:
