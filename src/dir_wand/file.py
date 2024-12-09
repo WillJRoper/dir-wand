@@ -217,6 +217,9 @@ class File:
         with open(path, "w") as file:
             file.writelines(lines)
 
+        # Copy the permissions
+        os.chmod(path, os.stat(path).st_mode)
+
     def make_copy_with_swaps(self, path, **swaps):
         """
         Make a copy of the file with the placeholders swapped out.
