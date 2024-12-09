@@ -41,7 +41,7 @@ def parse_swapfile(swapfile):
         return swaps
 
     # Process the swapfile if it already exists
-    if not os.path.isfile(swapfile):
+    if os.path.exists(swapfile):
         with open(swapfile, "r") as file:
             swapfile_dict = yaml.safe_load(file)
     else:
