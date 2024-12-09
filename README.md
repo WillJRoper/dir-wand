@@ -171,9 +171,9 @@ ignoring the need to pass the placeholders as arguments explictly to get the sam
 
 ### Creating a swap file
 
-Of course, if we do have a lot of place holders and want combinations of them its still tedious to write out the swapfile. WAND streamlines this process by providing a method to create swapfiles.
+Of course, if we do have a lot of place holders, its still tedious to write out the swapfile. WAND streamlines this process by providing a method to create swapfiles containing all possible combinations of input swaps.
 
-If we pass the `--swapfile` argument but omit the `--template` argument we can provide the swaps we want every possible combination of in our file. For instance,
+If we pass only the `--swapfile` argument alongisde and the swaps we want combined in our file. For instance:
 
 ```sh
 dir-wand --swapfile swapfile.yaml --num 0-1 --num2 0-1
