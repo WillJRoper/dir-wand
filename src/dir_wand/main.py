@@ -11,6 +11,7 @@ Example:
 from dir_wand.art import ASCII_ART
 from dir_wand.logger import Logger
 from dir_wand.parser import Parser
+from dir_wand.swapfile import make_swapfile
 
 
 def copies_main(args):
@@ -25,6 +26,17 @@ def copies_main(args):
     # modules that use it's decorators
     from dir_wand.template import Template
 
+    # Ensure we have the same number of elements for all swaps, we do this
+    # here because not all use cases require the number to be equal at the time
+    # of parsing
+    length_dict = {key: len(value) for key, value in args.swaps.items()}
+    lengths = {len(value) for value in args.swaps.values()}
+    if len(lengths) > 1:
+        raise ValueError(
+            "All swaps must have the same number of elements. "
+            f"Got: {length_dict}"
+        )
+
     # Create the template
     template = Template(args.template, run=args.run, **args.swaps)
 
@@ -38,6 +50,18 @@ def copies_main(args):
     template.make_copies(args.root)
 
 
+def swapfile_main(args):
+    """
+    Create a swapfile for a template directory.
+
+    Args:
+        args (Namespace):
+            The parsed command line arguments.
+    """
+    # Make the swapfile
+    make_swapfile(args.swapfile, args.swaps)
+
+
 def run_main(args):
     """
     Run a command in a directory.
@@ -49,6 +73,17 @@ def run_main(args):
     # Delay import to ensure Logger is instantiated before we import
     # modules that use it's decorators
     from dir_wand.command_runner import CommandRunner
+
+    # Ensure we have the same number of elements for all swaps, we do this
+    # here because not all use cases require the number to be equal at the time
+    # of parsing
+    length_dict = {key: len(value) for key, value in args.swaps.items()}
+    lengths = {len(value) for value in args.swaps.values()}
+    if len(lengths) > 1:
+        raise ValueError(
+            "All swaps must have the same number of elements. "
+            f"Got: {length_dict}"
+        )
 
     # Create the command runner
     command_runner = CommandRunner(args.run)
@@ -77,8 +112,15 @@ def main():
     # Are we copying a template?
     if args.template is not None:
         copies_main(args)
+
+    # If we have no template but have been given a swapfile, we're creating
+    # a swapfile
+    elif args.swapfile is not None and args.run is None:
+        swapfile_main(args)
+        return  # no point in reporting
+
+    # Otherwise, we're simply running a command
     else:
-        # Otherwise, we're simply running a command
         run_main(args)
 
     # Report what we've done

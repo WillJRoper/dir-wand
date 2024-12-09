@@ -96,15 +96,6 @@ def parse_swaps(**swaps):
         else:
             raise ValueError(f"Invalid swap value: {value}")
 
-    # Ensure we have the same number of elements for all swaps
-    length_dict = {key: len(value) for key, value in swaps.items()}
-    lengths = {len(value) for value in swaps.values()}
-    if len(lengths) > 1:
-        raise ValueError(
-            "All swaps must have the same number of elements. "
-            f"Got: {length_dict}"
-        )
-
     return swaps
 
 
@@ -277,8 +268,15 @@ class Parser(argparse.ArgumentParser):
         # Parse arguments
         args, unknown_args = self.parse_known_args()
 
-        # Parse the swapfile (if no swapfile this just returns an empty dict)
-        args.swaps = parse_swapfile(args.swapfile)
+        # Parse the swapfile. If we have a swapfile but no template or run then
+        # we're creating a swapfile instead so we can ignore this step
+        if args.template is not None or args.run is not None:
+            args.swaps = parse_swapfile(args.swapfile)
+        else:
+            args.swaps = {}
+
+            # When creating a swapfile we want to be silent
+            args.silent = True
 
         # Process unknown_args manually
         while unknown_args:

@@ -5,9 +5,9 @@ name: WAND
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 permissions:
   contents: write
@@ -15,40 +15,41 @@ permissions:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 2
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencie
-      run: |
-        python -m pip install --upgrade pip
-        pip install .[test]
-    - uses: chartboost/ruff-action@v1  # Lint with Ruff
-    - name: Test
-      run: |
-        # Simple test of template copying
-        dir-wand --template tests/simple_test_{num}  --root tests/results/ --num 0-4 -x 1 2 3 4 5 --y 9-13 -flag 0 0 0 1 1
-        rm -r tests/results/*
-        # Simple test of template copying in silent mode
-        dir-wand --template tests/simple_test_{num}  --root tests/results/ --num 0-4 -x 1 2 3 4 5 --y 9-13 -flag 0 0 0 1 1 --silent
-        rm -r tests/results/*
-        # Simple test of runnning a command after copy
-        dir-wand --template tests/simple_test_{num}  --root tests/results/ --num 0-2 -x 1 2 3 --y 9-11 -flag 0 0 0 --run "cd tests/results/simple_test_{num}; cat simple_test_{num}.yaml; cat nested_dir/another_nested_dir/another_another_dir/nested_file.txt"
-        # Simple running of a command in existing directories
-        dir-wand --run "cd tests/results/simple_test_{num}; cat simple_test_{num}.yaml" --num 0-2
-        rm -r tests/results/*
-        # Mixing a file arg with other arg types
-        dir-wand --template tests/simple_test_{num} --root tests/results/ --num 0-10 --x 1-11 --y 10-20 --flag tests/test_flag.swaps
-        rm -r tests/results/*
-        # Using a swapfile
-        dir-wand --template tests/simple_test_{num} --root tests/results/ --swapfile tests/simple_test_swaps.yaml
-        rm -r tests/results/*
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencie
+        run: |
+          python -m pip install --upgrade pip
+          pip install .[test]
+      - uses: chartboost/ruff-action@v1 # Lint with Ruff
+      - name: Test
+        run: |
+          # Simple test of template copying
+          dir-wand --template tests/simple_test_{num}  --root tests/results/ --num 0-4 -x 1 2 3 4 5 --y 9-13 -flag 0 0 0 1 1
+          rm -r tests/results/*
+          # Simple test of template copying in silent mode
+          dir-wand --template tests/simple_test_{num}  --root tests/results/ --num 0-4 -x 1 2 3 4 5 --y 9-13 -flag 0 0 0 1 1 --silent
+          rm -r tests/results/*
+          # Simple test of runnning a command after copy
+          dir-wand --template tests/simple_test_{num}  --root tests/results/ --num 0-2 -x 1 2 3 --y 9-11 -flag 0 0 0 --run "cd tests/results/simple_test_{num}; cat simple_test_{num}.yaml; cat nested_dir/another_nested_dir/another_another_dir/nested_file.txt"
+          # Simple running of a command in existing directories
+          dir-wand --run "cd tests/results/simple_test_{num}; cat simple_test_{num}.yaml" --num 0-2
+          rm -r tests/results/*
+          # Mixing a file arg with other arg types
+          dir-wand --template tests/simple_test_{num} --root tests/results/ --num 0-10 --x 1-11 --y 10-20 --flag tests/test_flag.swaps
+          rm -r tests/results/*
+          # Creating a swapfile
+          dir-wand --swapfile tests/create_test_swaps.yaml --num 0-4 -x 1 2 3 4 5 --y 9-13 -flag 0 0 0 1 1 --silent
+          # Using a swapfile
+          dir-wand --template tests/simple_test_{num} --root tests/results/ --swapfile tests/simple_test_swaps.yaml
+          rm -r tests/results/*
