@@ -40,12 +40,9 @@ def parse_swapfile(swapfile):
     if swapfile is None:
         return swaps
 
-    # Process the swapfile if it already exists
-    if os.path.exists(swapfile):
-        with open(swapfile, "r") as file:
-            swapfile_dict = yaml.safe_load(file)
-    else:
-        return swaps
+    # Process the swapfile if given
+    with open(swapfile, "r") as file:
+        swapfile_dict = yaml.safe_load(file)
 
     # Unpack the contents of the swapfile
     for key, swap_dict in swapfile_dict.items():
@@ -271,8 +268,10 @@ class Parser(argparse.ArgumentParser):
         # Parse arguments
         args, unknown_args = self.parse_known_args()
 
-        # Parse the swapfile (if no swapfile this just returns an empty dict)
-        args.swaps = parse_swapfile(args.swapfile)
+        # Parse the swapfile. If we have a swapfile but no template then
+        # we're creating a swapfile instead so we can ignore this step
+        if args.template is not None:
+            args.swaps = parse_swapfile(args.swapfile)
 
         # Process unknown_args manually
         while unknown_args:
