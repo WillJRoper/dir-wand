@@ -1,0 +1,102 @@
+site_name: WAND Documentation
+site_description: Documentation for WAND - WAND Automates Nested Directories
+site_author: Will Roper
+site_url: https://willjroper.github.io/dir-wand/
+
+repo_name: WillJRoper/dir-wand
+repo_url: https://github.com/WillJRoper/dir-wand
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    # Light mode
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: true
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - admonition
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: guides/getting-started.md
+    - Quick Start: guides/quick-start.md
+  - User Guide:
+    - Working with Templates: guides/templates.md
+    - Placeholder System: guides/placeholders.md
+    - Swapfiles: guides/swapfiles.md
+    - Command Execution: guides/commands.md
+  - API Reference:
+    - Template: api/template.md
+    - Directory: api/directory.md
+    - File: api/file.md
+    - Parser: api/parser.md
+    - CommandRunner: api/command_runner.md
+    - Logger: api/logger.md
+    - Swapfile: api/swapfile.md
+    - Utils: api/utils.md
+  - Examples:
+    - Basic Examples: examples/basic.md
+    - Scientific Computing: examples/scientific.md
+    - Data Processing: examples/data-processing.md
+    - Testing & CI/CD: examples/testing.md
+  - Developer Guide:
+    - Architecture: developer/architecture.md
+    - Contributing: developer/contributing.md
+    - Development Setup: developer/setup.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/WillJRoper/dir-wand
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/dir-wand/
+
+copyright: Copyright &copy; 2024 Will Roper
