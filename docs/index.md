@@ -33,7 +33,7 @@ WAND is a Python CLI tool designed to automate the creation of large numbers of 
 pip install dir-wand
 ```
 
-### Basic Usage
+### CLI Usage
 
 Create a template directory with placeholders:
 
@@ -50,6 +50,32 @@ dir-wand --template template_{num} --num 0-2
 
 This creates `template_0/`, `template_1/`, and `template_2/` with the placeholder replaced in file names and contents.
 
+### Programmatic Usage
+
+WAND can also be used as a Python library:
+
+```python
+from dir_wand import create_directories
+
+# Create 10 experiment directories
+stats = create_directories(
+    template="experiment_{num}",
+    output_dir="/data/experiments",
+    num=range(10)
+)
+
+print(f"Created {stats['directories']} directories")
+```
+
+**Why use the programmatic API?**
+
+- **Integration**: Incorporate WAND into larger Python workflows
+- **Flexibility**: Generate parameters dynamically at runtime
+- **Type Safety**: Full type hints for IDE support
+- **Control**: Access to statistics and finer-grained control
+
+See the [Programmatic Usage Guide](guides/programmatic-usage.md) for more details.
+
 ## Documentation Structure
 
 ### User Guides
@@ -58,8 +84,10 @@ This creates `template_0/`, `template_1/`, and `template_2/` with the placeholde
 - [Placeholder System](guides/placeholders.md) - Understanding placeholders and swaps
 - [Swapfiles](guides/swapfiles.md) - Using YAML swapfiles for complex scenarios
 - [Command Execution](guides/commands.md) - Running commands in directories
+- [Programmatic Usage](guides/programmatic-usage.md) - Using WAND as a Python library
 
 ### API Reference
+- [Programmatic API](api/api.md) - High-level Python API for WAND
 - [Template Class](api/template.md) - Core template functionality
 - [Directory Class](api/directory.md) - Directory tree representation
 - [File Class](api/file.md) - File handling and copying

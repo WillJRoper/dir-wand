@@ -73,7 +73,9 @@ nav:
     - Placeholder System: guides/placeholders.md
     - Swapfiles: guides/swapfiles.md
     - Command Execution: guides/commands.md
+    - Programmatic Usage: guides/programmatic-usage.md
   - API Reference:
+    - Programmatic API: api/api.md
     - Template: api/template.md
     - Directory: api/directory.md
     - File: api/file.md
